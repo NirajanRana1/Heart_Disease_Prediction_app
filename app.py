@@ -14,18 +14,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
-# ============================================================================
-# PAGE CONFIGURATION
-# ============================================================================
+
+# Page configuration
 st.set_page_config(
     page_title="Heart Disease Prediction",
     page_icon="❤️",
     layout="wide"
 )
 
-# ============================================================================
-# PATHS
-# ============================================================================
+
+# Paths
 BASE_DIR = os.path.dirname(__file__)
 DATA_PATH = os.path.join(BASE_DIR, "heart_cleaned.csv")
 
@@ -34,9 +32,8 @@ MODEL_PATH = os.path.join(MODELS_DIR, "heart_model.pkl")
 SCALER_PATH = os.path.join(MODELS_DIR, "scaler.pkl")
 ACCURACY_PATH = os.path.join(MODELS_DIR, "accuracy.pkl")
 
-# ============================================================================
-# DATA LOADING
-# ============================================================================
+
+# Load dataset
 @st.cache_data
 def load_data():
     if not os.path.exists(DATA_PATH):
@@ -45,9 +42,8 @@ def load_data():
     df = pd.read_csv(DATA_PATH).drop_duplicates()
     return df
 
-# ============================================================================
-# MODEL TRAINING
-# ============================================================================
+
+# Train model
 @st.cache_resource
 def train_model():
     df = load_data()
@@ -83,9 +79,8 @@ def train_model():
 
     return model, scaler, accuracy, X.columns.tolist()
 
-# ============================================================================
-# LOAD OR TRAIN MODEL
-# ============================================================================
+
+# Load or train model
 @st.cache_resource
 def get_model():
     if os.path.exists(MODEL_PATH) and os.path.exists(SCALER_PATH) and os.path.exists(ACCURACY_PATH):
@@ -98,9 +93,8 @@ def get_model():
     else:
         return train_model()
 
-# ============================================================================
-# PREDICTION FUNCTION
-# ============================================================================
+
+# Prediction function
 def predict(model, scaler, input_data):
     arr = np.array(input_data).reshape(1, -1)
     arr_scaled = scaler.transform(arr)
@@ -108,9 +102,8 @@ def predict(model, scaler, input_data):
     probability = model.predict_proba(arr_scaled)[0]
     return prediction, probability
 
-# ============================================================================
-# MAIN APP
-# ============================================================================
+
+# Main app
 def main():
     st.title("❤️ Heart Disease Risk Prediction System")
     st.markdown("Machine Learning-based Cardiovascular Risk Assessment")
@@ -130,7 +123,7 @@ def main():
 
     tab1, tab2, tab3 = st.tabs(["Prediction", "Model Insights", "About"])
 
-    # ===================== PREDICTION TAB =====================
+    # Prediction
     with tab1:
         st.subheader("Enter Patient Information")
 
@@ -186,7 +179,8 @@ def main():
             st.write(f"Probability (No Disease): {probability[0]*100:.2f}%")
             st.write(f"Probability (Disease): {probability[1]*100:.2f}%")
 
-    # ===================== MODEL INSIGHTS =====================
+
+    # Model insights
     with tab2:
         st.subheader("Feature Importance")
 
@@ -210,7 +204,8 @@ def main():
         fig_target = px.pie(df, names="target", hole=0.4)
         st.plotly_chart(fig_target, width="stretch")
 
-    # ===================== ABOUT =====================
+
+    # About
     with tab3:
         st.markdown("""
         ### About This Project
@@ -225,6 +220,7 @@ def main():
 
     st.markdown("---")
     st.caption("© 2026 Heart Disease Prediction System")
+
 
 if __name__ == "__main__":
     main()
